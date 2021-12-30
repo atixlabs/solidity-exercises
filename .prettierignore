@@ -1,0 +1,20 @@
+# folders
+artifacts/
+build/
+cache/
+coverage/
+dist/
+lib/
+node_modules/
+typechain/
+profiles/
+docs/
+.gitlab/
+.vscode/
+
+# files
+coverage.json
+tsconfig.json
+README.md
+CONTRIBUTING.md
+CHANGELOG.md
