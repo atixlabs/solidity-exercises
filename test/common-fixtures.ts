@@ -1,10 +1,10 @@
 import { ethers, deployments } from "hardhat";
-import { WETH } from "../typechain";
+import { Vault } from "../typechain";
 
-export async function fixtureDeployedWETH(): Promise<WETH> {
+export async function fixtureDeployedVault(): Promise<Vault> {
   await deployments.fixture();
-  const deployedContract = await deployments.getOrNull("WETH");
-  if (deployedContract == undefined) throw new Error("No WETH deployed. Something weird happened");
-  const weth = await ethers.getContractAt("WETH", deployedContract.address);
-  return weth as WETH;
+  const deployedContract = await deployments.getOrNull("Vault");
+  if (deployedContract == undefined) throw new Error("No Vault deployed. Something weird happened");
+  const vault = await ethers.getContractAt("Vault", deployedContract.address);
+  return vault as Vault;
 }

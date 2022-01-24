@@ -17,7 +17,8 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   namedAccounts: {
     deployer: 0,
-    otherUser: 1,
+    firstDepositer: 1,
+    secondDepositer: 2,
   },
   networks: {
     hardhat: {
