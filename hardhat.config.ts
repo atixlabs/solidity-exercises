@@ -1,3 +1,4 @@
+import "@atixlabs/hardhat-time-n-mine";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-solhint";
 import "@nomiclabs/hardhat-waffle";
@@ -17,7 +18,9 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   namedAccounts: {
     deployer: 0,
-    otherUser: 1,
+    chooser: 0,
+    guesser: 1,
+    otherUser: 2,
   },
   networks: {
     hardhat: {

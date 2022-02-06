@@ -1,10 +1,19 @@
-import { ethers, deployments } from "hardhat";
-import { WETH } from "../typechain";
+import { deployments } from "hardhat";
+import { GuessTheNumber } from "../typechain";
 
-export async function fixtureDeployedWETH(): Promise<WETH> {
-  await deployments.fixture();
-  const deployedContract = await deployments.getOrNull("WETH");
-  if (deployedContract == undefined) throw new Error("No WETH deployed. Something weird happened");
-  const weth = await ethers.getContractAt("WETH", deployedContract.address);
-  return weth as WETH;
+export function fixtureDeployedGuessTheNumber(choice: number, salt: string): () => Promise<GuessTheNumber> {
+  return deployments.createFixture(async ({ deployments, getNamedAccounts, ethers }) => {
+    await deployments.fixture();
+    const { guesser } = await getNamedAccounts();
+
+    const deployedContract = await deployments.getOrNull("GuessTheNumber");
+    if (deployedContract == undefined) throw new Error("No GuessTheNumber deployed. Something weird happened");
+    const guessTheNumber = (await ethers.getContractAt("GuessTheNumber", deployedContract.address)) as GuessTheNumber;
+    await guessTheNumber.initialize(
+      ethers.utils.solidityKeccak256(["uint256", "uint256"], [choice, salt]),
+      guesser,
+      10000,
+    );
+    return guessTheNumber;
+  });
 }

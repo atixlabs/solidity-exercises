@@ -6,13 +6,13 @@ const deployFunc: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
   const { deploy } = deployments;
 
-  const deployResult = await deploy("WETH", {
+  const deployResult = await deploy("GuessTheNumber", {
     from: deployer,
     gasLimit: 4000000,
   });
-  console.log(`WETH deployed at ${deployResult.address}`);
+  console.log(`GuessTheNumber deployed at ${deployResult.address}`);
   return hre.network.live; // prevents re execution on live networks
 };
 export default deployFunc;
 
-deployFunc.id = "deployed_weth"; // id required to prevent reexecution
+deployFunc.id = "deployed_guessTheNumber"; // id required to prevent reexecution
