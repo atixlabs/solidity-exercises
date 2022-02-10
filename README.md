@@ -1,10 +1,10 @@
 # Project Title
 
-This project contains the boilerplate that must be used when dealing with Solidity based Smart Contracts developmen projects.
+This project contains the boilerplate that must be used when dealing with Solidity based Smart Contracts development projects.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
@@ -16,6 +16,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 # Install proper node version
 nvm use
 ```
+
+Create `.env` file (you can base on [`.env.example`](./.env.example))
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
@@ -70,27 +72,56 @@ We are requiring Chai which is an assertions library. These asserting functions 
 
 For more information we suggest reading waffle testing documentation [here](https://hardhat.org/guides/waffle-testing.html#testing).
 
-## Scripts
+### Ethereum Security Toolbox
 
-```bash
+To check the code statically you can use the Ethereum Security Toolbox made by Trail of Bits.
 
-npm run compile       #Compile the contract
-npm run test          #Runs automated tests
-npm run lint          #Executes a linter over your files
-npm run format        #Executes a prettier over your files
-npm run node          #Runs a local mockchain
-npm run deploy-local  #Deploys the contract in a local network
-npm run console-local #Runs an interactive console pointing to the local network
+#### Slither
+
+##### Default option
+
+You could just run the default checking executing
+
+`npm run security-default`
+
+##### Flexibile option
+
+Or if you want more flexibility, first execute the command 
+
+`npm run security`
+
+and once inside the docker container run 
 
 ```
+solc-select 0.8.9
+cd project
+```
 
-## Deployment
+so that you can use the tools there installed.
 
-To deploy your contract locally
+#### Echidna
 
-- Run a local mockchain: `npm run node`
-- Open another terminal and deploy your contracts locally: `npm run deploy-local`
-- You can interact with your contract through the console: `npm run console-local`
+echidna-test takes a contract and a list of invariants (properties that should always remain true) as input. For each invariant, it generates random sequences of calls to the contract and checks if the invariant holds. If it can find some way to falsify the invariant, it prints the call sequence that does so. If it can't, you have some assurance the contract is safe.
+Invariants are expressed as Solidity functions with names that begin with echidna_, have no arguments, and return a boolean.
+
+after finishing, a coverage folder will be created containing a copy of the source code with coverage annotations.
+
+* '*' if an execution ended with a STOP
+* 'r' if an execution ended with a REVERT
+* 'o' if an execution ended with an out-of-gas error
+* 'e' if an execution ended with any other error (zero division, assertion failure, etc)
+
+the configuration file default.yalm allows users to choose EVM and test generation parameters
+
+compile contracts
+
+`npm run compile`
+
+then, execute this command passing contract name as argument
+
+`npm run echidna --contract=EchidnaTester`
+
+for more information [here](https://github.com/crytic/echidna)
 
 ## Built With
 
@@ -100,6 +131,13 @@ To deploy your contract locally
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
+## Versioning
+
+We use [SemVer](http://semver.org/) and [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
+
+To create a new release execute the script
+
+`npm run release`
 
 ## License
 
