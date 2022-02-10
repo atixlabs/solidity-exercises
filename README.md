@@ -1,6 +1,6 @@
-# Project Title
+# Upgradeable Airdrop
 
-This project contains the boilerplate that must be used when dealing with Solidity based Smart Contracts development projects.
+This project is an academic example to showcase how to deploy, upgrade, use a merkle tree, and some tooling that we use in the Blockchain Studio
 
 ## Getting Started
 
@@ -72,6 +72,8 @@ We are requiring Chai which is an assertions library. These asserting functions 
 
 For more information we suggest reading waffle testing documentation [here](https://hardhat.org/guides/waffle-testing.html#testing).
 
+We also strongly recommend using the fixtures of hardhat-deploy.
+
 ### Ethereum Security Toolbox
 
 To check the code statically you can use the Ethereum Security Toolbox made by Trail of Bits.
@@ -82,7 +84,7 @@ To check the code statically you can use the Ethereum Security Toolbox made by T
 
 You could just run the default checking executing
 
-`npm run security-default`
+`npm run slither`
 
 ##### Flexibile option
 
@@ -99,7 +101,7 @@ cd project
 
 so that you can use the tools there installed.
 
-#### Echidna
+#### Echidna(not intended to be used yet)
 
 echidna-test takes a contract and a list of invariants (properties that should always remain true) as input. For each invariant, it generates random sequences of calls to the contract and checks if the invariant holds. If it can find some way to falsify the invariant, it prints the call sequence that does so. If it can't, you have some assurance the contract is safe.
 Invariants are expressed as Solidity functions with names that begin with echidna_, have no arguments, and return a boolean.
