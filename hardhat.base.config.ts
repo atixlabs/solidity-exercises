@@ -19,6 +19,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 import "solidity-coverage";
+import "@atixlabs/hardhat-time-n-mine";
 
 chai.use(solidity);
 
@@ -67,7 +68,9 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   namedAccounts: {
     deployer: 0,
-    otherUser: 1,
+    sender: 0,
+    receiver: 1,
+    anotherUser: 2,
   },
   networks: {
     hardhat: {
