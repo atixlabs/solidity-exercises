@@ -14,10 +14,17 @@ contract PaymentChannelsFactory {
         implementation = implementation_;
     }
 
-    function createChannel(address payable receiver_, uint256 duration_) external payable {
-        require(msg.value > 0, "PaymentChannelsFactory: no value sent");
+    function createChannel(
+        address receiver_,
+        uint256 duration_,
+        ERC1155 token,
+        uint256 id,
+        uint256 amount
+    ) external {
+        require(amount > 0, "PaymentChannelsFactory: no value sent");
         PaymentChannel clone = PaymentChannel(Clones.clone(implementation));
-        clone.initialize{ value: msg.value }(payable(msg.sender), receiver_, duration_);
+        token.safeTransferFrom(msg.sender, address(clone), id, amount, "0x0");
+        clone.initialize(payable(msg.sender), receiver_, duration_, token, id);
         emit PaymentChannelCreated(clone);
     }
 }

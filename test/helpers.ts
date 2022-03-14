@@ -2,6 +2,7 @@ import { TypedDataDomain, TypedDataField } from "@ethersproject/abstract-signer"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ContractTransaction } from "ethers";
 import { PaymentChannel, PaymentChannelsFactory } from "../typechain";
+import { MockToken } from "../typechain/MockToken";
 import { fixturePaymentChannelCreation } from "./common-fixtures";
 
 export interface MochaBaseContext {
@@ -9,6 +10,7 @@ export interface MochaBaseContext {
   sender: SignerWithAddress;
   receiver: SignerWithAddress;
   paymentChannel: PaymentChannel;
+  token: MockToken;
   tx: ContractTransaction;
 }
 declare module "mocha" {

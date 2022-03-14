@@ -2,7 +2,7 @@ import { ContractTransaction } from "@ethersproject/contracts";
 import { expect } from "chai";
 import { ethers, getNamedAccounts } from "hardhat";
 import { PaymentChannel, PaymentChannel__factory } from "../typechain";
-import { DEFAULT_DURATION, DEFAULT_VALUE } from "./constants";
+import { DEFAULT_DURATION, DEFAULT_ID, DEFAULT_VALUE } from "./constants";
 import { MochaBaseContext, defaultInitialization, createSignature } from "./helpers";
 
 declare module "mocha" {
@@ -21,8 +21,8 @@ describe("Close - Signature usage", function () {
         const signature = await createSignature(this.sender, this.paymentChannel, this.amount);
         this.tx = await this.paymentChannel.connect(this.receiver).close(this.amount, signature);
       });
-      it("THEN the change is sent back to the sender ", function () {
-        return expect(true).to.be.true; // TODO
+      it("THEN the change is sent back to the sender ", async function () {
+        return expect(await this.token.connect(this.sender).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(DEFAULT_VALUE - this.amount);
       });
 
       it("THEN contract gets destructed", async function () {
@@ -33,8 +33,8 @@ describe("Close - Signature usage", function () {
         return expect(this.tx).to.emit(this.paymentChannel, "PaymentChannelClosed").withArgs(this.amount);
       });
 
-      it("THEN the receiver receives the amount", function () {
-        return expect(true).to.be.true; // TODO
+      it("THEN the receiver receives the amount", async function () {
+        return expect(await this.token.connect(this.receiver).balanceOf(this.receiver.address, DEFAULT_ID)).to.be.equal(this.amount);
       });
     });
   });
@@ -42,7 +42,7 @@ describe("Close - Signature usage", function () {
     before(defaultInitialization);
     describe("WHEN the receiver sends a signed payment with an amount equal to the total", function () {
       before(async function () {
-        this.amount = DEFAULT_VALUE - 1;
+        this.amount = DEFAULT_VALUE;
         const signature = await createSignature(this.sender, this.paymentChannel, this.amount);
         this.tx = await this.paymentChannel.connect(this.receiver).close(this.amount, signature);
       });
@@ -50,11 +50,11 @@ describe("Close - Signature usage", function () {
         return expect(await this.paymentChannel.provider.getCode(this.paymentChannel.address)).to.be.equal("0x");
       });
 
-      it("THEN the receiver receives the amount", function () {
-        return expect(true).to.be.true; // TODO
+      it("THEN the receiver receives the amount", async function () {
+        return expect(await this.token.connect(this.receiver).balanceOf(this.receiver.address, DEFAULT_ID)).to.be.equal(this.amount);
       });
-      it("THEN no change is sent back to the sender", function () {
-        // TODOD
+      it("THEN no change is sent back to the sender", async function () {
+        return expect(await this.token.connect(this.receiver).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(0);
       });
 
       it("THEN an event is emitted", function () {
@@ -67,10 +67,10 @@ describe("Close - Signature usage", function () {
     before(defaultInitialization);
     describe("WHEN the receiver sends a signed payment with an amount greater than the total", function () {
       it("THEN the transaction fails", async function () {
-        this.amount = DEFAULT_VALUE + 10;
+        this.amount = DEFAULT_VALUE + 1;
         const signature = await createSignature(this.sender, this.paymentChannel, this.amount);
         return expect(this.paymentChannel.connect(this.receiver).close(this.amount, signature)).to.be.revertedWith(
-          "PaymentChannel: failed to send Ether",
+          "ERC1155: insufficient balance for transfer",
         );
       });
     });

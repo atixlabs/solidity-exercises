@@ -3,12 +3,16 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
-contract PaymentChannel is EIP712 {
+contract PaymentChannel is EIP712, ERC1155Receiver {
     bool private initialized;
     address payable public sender;
-    address payable public receiver;
+    address public receiver;
     uint256 public expiresAt;
+    ERC1155 public token;
+    uint256 public id;
 
     struct Payment {
         uint256 amount;
@@ -24,31 +28,55 @@ contract PaymentChannel is EIP712 {
 
     function initialize(
         address payable sender_,
-        address payable receiver_,
-        uint256 duration_
-    ) external payable {
+        address receiver_,
+        uint256 duration_,
+        ERC1155 token_,
+        uint256 id_
+    ) external {
         require(!initialized, "PaymentChannel: already initialized");
         sender = sender_;
         receiver = receiver_;
         expiresAt = block.timestamp + duration_;
+        token = token_;
+        id = id_;
         initialized = true;
     }
 
-    function close(uint256 _amount, bytes memory _sig) external {
+    function close(uint256 amount, bytes memory sig) external {
         require(msg.sender == receiver, "PaymentChannel: not receiver");
-        require(_verify(_amount, _sig), "PaymentChannel: invalid signature");
-
-        (bool sent, ) = receiver.call{ value: _amount }("");
-        require(sent, "PaymentChannel: failed to send Ether");
-        emit PaymentChannelClosed(_amount);
-        selfdestruct(sender); // Sends funds back to sender_
+        require(_verify(amount, sig), "PaymentChannel: invalid signature");
+        token.safeTransferFrom(address(this), receiver, id, amount, "0x0");
+        emit PaymentChannelClosed(amount);
+        token.safeTransferFrom(address(this), sender, id, token.balanceOf(address(this), id), "0x0");
+        selfdestruct(sender);
     }
 
     function cancel() external {
         require(msg.sender == sender, "PaymentChannel: not sender");
         require(block.timestamp >= expiresAt, "PaymentChannel: not expired yet");
         emit PaymentChannelCancelled();
-        selfdestruct(sender); // Sends funds back to sender_
+        token.safeTransferFrom(address(this), sender, id, token.balanceOf(address(this), id), "0x0");
+        selfdestruct(sender);
+    }
+
+    function onERC1155Received(
+        address,
+        address,
+        uint256,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
+        return IERC1155Receiver.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address,
+        address,
+        uint256[] calldata,
+        uint256[] calldata,
+        bytes calldata
+    ) external returns (bytes4) {
+        return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
     function _verify(uint256 amount, bytes memory signature) private view returns (bool) {

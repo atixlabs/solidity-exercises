@@ -1,15 +1,17 @@
 import { expect } from "chai";
 import { PaymentChannel__factory } from "../typechain";
-import { DEFAULT_DURATION, DEFAULT_VALUE } from "./constants";
+import { DEFAULT_DURATION, DEFAULT_ID, DEFAULT_VALUE } from "./constants";
 import { defaultInitialization } from "./helpers";
 
 describe("Creation and intialization", function () {
   describe("GIVEN a factory is deployed", function () {
     before(defaultInitialization);
-    describe("WHEN a user tries to create a channel 0 value", function () {
+    describe("WHEN a user tries to create a channel with 0 value", function () {
       it("THEN the transaction reverts", function () {
         return expect(
-          this.paymentChannelsFactory.connect(this.sender).createChannel(this.receiver.address, DEFAULT_DURATION),
+          this.paymentChannelsFactory
+            .connect(this.sender)
+            .createChannel(this.receiver.address, DEFAULT_DURATION, this.token.address, DEFAULT_ID, 0),
         ).to.be.revertedWith("Factory: no value sent");
       });
     });
@@ -19,9 +21,13 @@ describe("Creation and intialization", function () {
     describe("WHEN a user tries to reinitialize it", function () {
       it("THEN the transaction reverts", function () {
         return expect(
-          this.paymentChannel.initialize(this.sender.address, this.receiver.address, DEFAULT_DURATION, {
-            value: 3,
-          }),
+          this.paymentChannel.initialize(
+            this.sender.address,
+            this.receiver.address,
+            DEFAULT_DURATION,
+            this.token.address,
+            DEFAULT_ID,
+          ),
         ).to.be.revertedWith("PaymentChannel: already initialized");
       });
     });
@@ -30,9 +36,11 @@ describe("Creation and intialization", function () {
     before(defaultInitialization);
     describe("WHEN a user creates a channel", function () {
       before(async function () {
+        await this.token.connect(this.sender).mint(this.sender.address, DEFAULT_ID, DEFAULT_VALUE, "0x00");
+        await this.token.connect(this.sender).setApprovalForAll(this.paymentChannelsFactory.address, true);
         this.tx = await this.paymentChannelsFactory
           .connect(this.sender)
-          .createChannel(this.receiver.address, DEFAULT_DURATION, { value: DEFAULT_VALUE });
+          .createChannel(this.receiver.address, DEFAULT_DURATION, this.token.address, DEFAULT_ID, DEFAULT_VALUE);
         const creationEvent = await this.tx.wait(1).then(e => {
           return e.events?.find(x => x.event === "PaymentChannelCreated");
         });
@@ -58,31 +66,9 @@ describe("Creation and intialization", function () {
         return expect(await this.paymentChannel.expiresAt()).to.be.equal((DEFAULT_DURATION + timestamp).toString());
       });
       it("THEN the funds are locked", async function () {
-        return expect(await this.paymentChannel.provider.getBalance(this.paymentChannel.address)).to.equal(
+        return expect(await this.token.connect(this.sender).balanceOf(this.paymentChannel.address, DEFAULT_ID)).to.equal(
           DEFAULT_VALUE,
         );
-      });
-    });
-  });
-
-  describe("GIVEN a factory is deployed", function () {
-    before(defaultInitialization);
-    describe("WHEN a user creates a contract with 0 value", function () {
-      before(async function () {
-        const deployResult = await this.paymentChannelsFactory
-          .connect(this.sender)
-          .createChannel(this.receiver.address, DEFAULT_DURATION, { value: DEFAULT_VALUE });
-        const creationEvent = await deployResult.wait(1).then(e => {
-          return e.events?.find(x => x.event === "PaymentChannelCreated");
-        });
-        this.paymentChannel = new PaymentChannel__factory().attach(creationEvent?.args?.channel).connect(this.sender);
-      });
-      it("THEN the transaction reverts", function () {
-        return expect(
-          this.paymentChannel
-            .connect(this.sender)
-            .initialize(this.sender.address, this.receiver.address, DEFAULT_DURATION, { value: 3 }),
-        ).to.be.revertedWith("PaymentChannel: already initialized");
       });
     });
   });
