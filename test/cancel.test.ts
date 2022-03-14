@@ -20,7 +20,9 @@ describe("Cancel - Timeout", function () {
         this.tx = await this.paymentChannel.connect(this.sender).cancel();
       });
       it("THEN the commited amount is sent back", async function () {
-        return expect(await this.token.connect(this.sender).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(DEFAULT_VALUE);
+        return expect(await this.token.connect(this.sender).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(
+          DEFAULT_VALUE,
+        );
       });
       it("THEN the contract is destroyed", async function () {
         return expect(await this.paymentChannel.provider.getCode(this.paymentChannel.address)).to.be.equal("0x");

@@ -42,7 +42,7 @@ export const createFixtureChannelCreation = function (
       ethers.getSigner(accounts.receiver),
     );
     const paymentChannelsFactory = factory.connect(sender);
-    await token.connect(sender).mint(sender.address, DEFAULT_ID, value, '0x00');
+    await token.connect(sender).mint(sender.address, DEFAULT_ID, value, "0x00");
     await token.connect(sender).setApprovalForAll(paymentChannelsFactory.address, true);
     const tx = await paymentChannelsFactory.createChannel(receiver.address, duration, token.address, DEFAULT_ID, value);
     const creationEvent = await tx.wait(1).then(e => {

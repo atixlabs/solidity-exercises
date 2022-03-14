@@ -22,7 +22,9 @@ describe("Close - Signature usage", function () {
         this.tx = await this.paymentChannel.connect(this.receiver).close(this.amount, signature);
       });
       it("THEN the change is sent back to the sender ", async function () {
-        return expect(await this.token.connect(this.sender).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(DEFAULT_VALUE - this.amount);
+        return expect(await this.token.connect(this.sender).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(
+          DEFAULT_VALUE - this.amount,
+        );
       });
 
       it("THEN contract gets destructed", async function () {
@@ -34,7 +36,9 @@ describe("Close - Signature usage", function () {
       });
 
       it("THEN the receiver receives the amount", async function () {
-        return expect(await this.token.connect(this.receiver).balanceOf(this.receiver.address, DEFAULT_ID)).to.be.equal(this.amount);
+        return expect(await this.token.connect(this.receiver).balanceOf(this.receiver.address, DEFAULT_ID)).to.be.equal(
+          this.amount,
+        );
       });
     });
   });
@@ -51,10 +55,14 @@ describe("Close - Signature usage", function () {
       });
 
       it("THEN the receiver receives the amount", async function () {
-        return expect(await this.token.connect(this.receiver).balanceOf(this.receiver.address, DEFAULT_ID)).to.be.equal(this.amount);
+        return expect(await this.token.connect(this.receiver).balanceOf(this.receiver.address, DEFAULT_ID)).to.be.equal(
+          this.amount,
+        );
       });
       it("THEN no change is sent back to the sender", async function () {
-        return expect(await this.token.connect(this.receiver).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(0);
+        return expect(await this.token.connect(this.receiver).balanceOf(this.sender.address, DEFAULT_ID)).to.be.equal(
+          0,
+        );
       });
 
       it("THEN an event is emitted", function () {

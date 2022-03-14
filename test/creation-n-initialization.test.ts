@@ -66,9 +66,9 @@ describe("Creation and intialization", function () {
         return expect(await this.paymentChannel.expiresAt()).to.be.equal((DEFAULT_DURATION + timestamp).toString());
       });
       it("THEN the funds are locked", async function () {
-        return expect(await this.token.connect(this.sender).balanceOf(this.paymentChannel.address, DEFAULT_ID)).to.equal(
-          DEFAULT_VALUE,
-        );
+        return expect(
+          await this.token.connect(this.sender).balanceOf(this.paymentChannel.address, DEFAULT_ID),
+        ).to.equal(DEFAULT_VALUE);
       });
     });
   });
