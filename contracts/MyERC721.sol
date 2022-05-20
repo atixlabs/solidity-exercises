@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 // Some parts of the standard are ignored for simplicity
 contract MyERC721 is IERC721, ERC165 {
     mapping(uint256 => address) private _owner;
-    mapping(uint256 => address) private _allowed;
+    // TODO Add missing structure
     mapping(address => mapping(address => bool)) private _isOperator;
     mapping(address => uint256) private _balances;
 
@@ -36,12 +36,7 @@ contract MyERC721 is IERC721, ERC165 {
     }
 
     modifier onlyAllowed(uint256 tokenId) {
-        address owner = ownerOf(tokenId);
-        require(
-            owner == msg.sender || _allowed[tokenId] == msg.sender || _isOperator[owner][msg.sender],
-            "Not allowed"
-        );
-        _;
+        // TODO implement this function
     }
 
     function ownerOf(uint256 tokenId) public view returns (address) {
@@ -49,7 +44,7 @@ contract MyERC721 is IERC721, ERC165 {
     }
 
     function approve(address to, uint256 tokenId) external onlyHolder(tokenId) {
-        _allowed[tokenId] = to;
+        // TODO something is missing here
         emit Approval(msg.sender, to, tokenId);
     }
 
@@ -66,13 +61,8 @@ contract MyERC721 is IERC721, ERC165 {
         address from,
         address to,
         uint256 tokenId
-    ) public onlyAllowed(tokenId) {
-        require(from == ownerOf(tokenId), "Incorrect owner");
-        _clearApproval(tokenId);
-        _owner[tokenId] = to;
-        _balances[from] -= 1;
-        _balances[to] += 1;
-        emit Transfer(from, to, tokenId);
+    ) public onlyAllowed(tokenId) { // Modifier?
+        // TODO Implement this
     }
 
     function transferFrom(
@@ -97,11 +87,11 @@ contract MyERC721 is IERC721, ERC165 {
     }
 
     function getApproved(uint256 tokenId) public view returns (address) {
-        return _allowed[tokenId];
+        // TODO Implement this
     }
 
     function _clearApproval(uint256 tokenId) private {
-        _allowed[tokenId] = address(0);
+        // TODO Implement this
     }
 
     function _mint(address to, uint256 tokenId) private {
